@@ -163,12 +163,16 @@ app.get("*", (req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Asset server running on http://localhost:${PORT}`);
-  if (!PUBLIC_BASE_URL) {
-    console.log("Tip: set PUBLIC_BASE_URL for production barcode URLs (e.g. https://assets.nitk.edu.in)");
-  }
-  if (!process.env.DATABASE_URL) {
-    console.log("WARNING: DATABASE_URL is not set. Data features will not work until connected to Postgres.");
-  }
-});
+export { app };
+
+if (process.env.NODE_ENV !== "production" || process.env.RENDER) {
+  app.listen(PORT, () => {
+    console.log(`Asset server running on http://localhost:${PORT}`);
+    if (!PUBLIC_BASE_URL) {
+      console.log("Tip: set PUBLIC_BASE_URL for production barcode URLs (e.g. https://assets.nitk.edu.in)");
+    }
+    if (!process.env.DATABASE_URL) {
+      console.log("WARNING: DATABASE_URL is not set. Data features will not work until connected to Postgres.");
+    }
+  });
+}

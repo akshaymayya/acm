@@ -1,0 +1,22 @@
+[build]
+  # When we build on Netlify, we build the frontend client
+  command = "npm install && npm run build --prefix client"
+  publish = "client/dist"
+  functions = "netlify/functions"
+
+[functions]
+  # Tell Netlify that we use Node modules from the top level
+  node_bundler = "esbuild"
+  external_node_modules = ["pg", "serverless-http", "express", "cors"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  # Redirect all other requests to the React frontend
+  from = "/*"
+  to = "/index.html"
+  status = 200
