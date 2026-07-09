@@ -4,7 +4,7 @@ This plan outlines the easiest step-by-step approach to get your Asset Tracker l
 
 ## User Review Required
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Please review the phases below. Let me know if you want to proceed with **Phase 1** (Quick free demo) right now, or if you want to jump straight to **Phase 2** (Permanent Cloud Hosting).
 
 ---
