@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { MemberCard } from './member-card'
 
 interface Team {
@@ -53,6 +54,7 @@ const teams: Team[] = [
 
 export function TeamSection() {
   let memberIndex = 0
+  const router = useRouter()
 
   return (
     <section className="relative py-20 px-4 md:px-8">
@@ -93,9 +95,9 @@ export function TeamSection() {
 
               {/* Members grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {team.members.map((member) => (
+                {team.members.map((member, idx) => (
                   <MemberCard
-                    key={`${member.name}-${member.usn}`}
+                    key={`${member.name}-${member.usn}-${idx}`}
                     name={member.name}
                     usn={member.usn}
                     index={memberIndex++}
@@ -114,7 +116,7 @@ export function TeamSection() {
           className="mt-20 text-center"
         >
           <button
-            onClick={() => window.dispatchEvent(new Event('replay-reveal'))}
+            onClick={() => router.push('/')}
             className="px-6 py-3 border border-dashed border-zinc-850 hover:border-accent bg-zinc-950/40 text-xs tracking-widest text-zinc-500 hover:text-accent rounded-full transition duration-300 uppercase cursor-pointer"
           >
             Replay Entrance Ritual 🔮

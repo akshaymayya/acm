@@ -94,6 +94,11 @@ class SoundEffects {
 
 const sfx = new SoundEffects()
 
+const VAULT_MEMBER_PHOTO = "/member.png";
+const GATEKEEPER_PRESIDENT_PHOTO = "/president.png";
+const GATEKEEPER_BG_AUDIO = "/gatekeeper-audio.mp3.mpeg";
+const GATEKEEPER_BRIBE_REACTION_PHOTO = "/vimal.jpg";
+
 export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
   const [state, setState] = useState<RevealState>('vault')
   const [muted, setMuted] = useState(false)
@@ -110,15 +115,14 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
 
   // Dialogue sequence for the Gatekeeper
   const dialogue = [
-    { text: "HALT! Who goes there?! State your business at the ACM Core Vault.", options: null },
+    { text: "Tradition, Prestige, Discipline... These are the three pillars of this Gurukul. These are the ideals upon which we build your tomorrow.", options: null },
     { text: "Hmm... Scanning database for selected ACM 2026-27 candidates...", options: null },
     { text: "WAIT! Let me check the USN database... Running GigaChad credentials script...", options: null },
     {
       text: "ACCESS GRANTED, OH MY GODDD, NICE EYES THOUGH! Welcome to ACM 2026-27! 🐐👑",
       options: [
         { label: "ENTER THE REALM", action: 'enter' },
-        { label: "Try to Bribe with Starbucks Coupon ☕", action: 'bribe' },
-        { label: "Hacker Bypass 💻", action: 'hack' }
+        { label: "Try to Bribe with Vimal Masala", action: 'bribe' }
       ]
     }
   ]
@@ -126,7 +130,7 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
   // Typewriter effect
   useEffect(() => {
     if (state !== 'gatekeeper') return
-    const currentText = dialogue[dialogIndex].text
+    const currentText = activeBribe ? "bolo ACM kesari" : dialogue[dialogIndex].text
     let i = 0
     setTypewriterText('')
     
@@ -140,7 +144,7 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
     }, 25)
 
     return () => clearInterval(interval)
-  }, [state, dialogIndex])
+  }, [state, dialogIndex, activeBribe])
 
   // Lock scroll initially
   useEffect(() => {
@@ -221,12 +225,6 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
       proceedToOpening()
     } else if (action === 'bribe') {
       setActiveBribe(true)
-      setTypewriterText("A Pumpkin Spice Latte coupon?! *Gasp* Access is double-granted! Enter, you rich legend! 🚀")
-    } else if (action === 'hack') {
-      setTypewriterText("ADMIN ACCESS DETECTED: Bypass successful. Enjoy your god mode! 👾")
-      setTimeout(() => {
-        proceedToOpening()
-      }, 1500)
     }
   }
 
@@ -289,6 +287,10 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
         playsInline
       />
       <audio ref={audioRef} src="/reveal-audio.mp3" className="hidden" />
+      {/* Gatekeeper Background Audio */}
+      {state === 'gatekeeper' && !activeBribe && (
+        <audio src={GATEKEEPER_BG_AUDIO} autoPlay loop muted={muted} className="hidden" />
+      )}
 
       {/* Mute Control */}
       <button
@@ -313,8 +315,20 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
               className="w-32 h-32 rounded-full border-4 border-dashed border-primary flex items-center justify-center mb-8 relative"
             >
-              <div className="absolute inset-2 rounded-full border border-accent opacity-50 flex items-center justify-center">
-                <Lock className="w-12 h-12 text-accent animate-pulse" />
+              <div className="absolute inset-2 rounded-full border border-accent flex items-center justify-center overflow-hidden animate-pulse bg-zinc-900">
+                {/* Fallback silhouette if image fails */}
+                <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-10 h-10 text-zinc-500 fill-current">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
+                </div>
+                {/* Photo Placeholder */}
+                <img 
+                  src={VAULT_MEMBER_PHOTO} 
+                  alt="Member" 
+                  className="absolute inset-0 w-full h-full object-cover z-10"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
               </div>
             </motion.div>
 
@@ -380,8 +394,7 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
                 {[...Array(6)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="absolute border border-primary/40 rounded-full"
-                    style={{ width: 100, height: 100 }}
+                    className="absolute border border-primary/40 rounded-full w-[100px] h-[100px]"
                     animate={{
                       scale: [1, 20],
                       opacity: [0, 1, 0],
@@ -440,29 +453,28 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
             exit={{ opacity: 0 }}
             className="max-w-xl w-full px-6 flex flex-col items-center text-center z-10"
           >
-            {/* Gatekeeper Character SVG Avatar */}
+            {/* Gatekeeper Character Photo Slot */}
             <motion.div
               animate={{ y: [0, -6, 0] }}
               transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-              className="w-36 h-36 bg-zinc-900 border-2 border-accent rounded-full mb-8 flex items-center justify-center p-4 relative group shadow-[0_0_20px_rgba(0,217,255,0.2)]"
+              className={
+                activeBribe 
+                  ? "w-64 h-64 md:w-80 md:h-80 bg-zinc-900 border-2 border-[#ffbe0b] rounded-lg mb-8 flex items-center justify-center relative shadow-[0_0_30px_rgba(255,190,11,0.3)] overflow-hidden"
+                  : "w-36 h-36 bg-zinc-900 border-2 border-accent rounded-full mb-8 flex items-center justify-center relative shadow-[0_0_20px_rgba(0,217,255,0.2)] overflow-hidden"
+              }
             >
-              {/* Glowing antenna */}
-              <div className="absolute -top-3 w-1.5 h-6 bg-accent rounded-full animate-pulse">
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-primary rounded-full animate-ping" />
+              {/* Fallback silhouette */}
+              <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" className="w-16 h-16 text-zinc-500 fill-current">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
               </div>
-              
-              <svg
-                viewBox="0 0 100 100"
-                className="w-full h-full text-accent fill-none stroke-current stroke-2"
-              >
-                <rect x="25" y="30" width="50" height="40" rx="10" />
-                <path d="M30 70 L20 85 M70 70 L80 85" strokeWidth="3" strokeLinecap="round" />
-                <circle cx="40" cy="48" r="5" className="fill-accent animate-ping" />
-                <circle cx="40" cy="48" r="3" className="fill-accent" />
-                <circle cx="60" cy="48" r="5" className="fill-accent animate-ping" />
-                <circle cx="60" cy="48" r="3" className="fill-accent" />
-                <path d="M42 60 Q50 64 58 60" strokeWidth="3" strokeLinecap="round" />
-              </svg>
+              <img 
+                src={activeBribe ? GATEKEEPER_BRIBE_REACTION_PHOTO : GATEKEEPER_PRESIDENT_PHOTO}
+                alt={activeBribe ? "Bribe Reaction" : "President"}
+                className="absolute inset-0 w-full h-full object-cover z-10"
+                onError={(e) => { e.currentTarget.style.display = 'none' }}
+              />
             </motion.div>
 
             {/* Dialogue Bubble */}
@@ -497,7 +509,7 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
                   }
                   className="w-full py-3 bg-accent text-black font-extrabold rounded-lg hover:bg-white transition duration-200"
                 >
-                  {dialogIndex === dialogue.length - 1 || activeBribe ? "ENTER THE GATEWAY" : "CONTINUE"}
+                  {activeBribe ? "Continue" : (dialogIndex === dialogue.length - 1 ? "ENTER THE GATEWAY" : "CONTINUE")}
                 </button>
               )}
             </div>
