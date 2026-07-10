@@ -446,6 +446,32 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
 
         {/* State: Gatekeeper Greeting Dialog */}
         {state === 'gatekeeper' && (
+          activeBribe ? (
+            <motion.div
+              key="gatekeeper-bribe"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-red-600 to-orange-500 p-6"
+            >
+              <div className="relative z-10 flex flex-col items-center max-w-4xl w-full">
+                <img 
+                  src="/vimal-bg.jpeg" 
+                  alt="Vimal Bribe" 
+                  className="w-auto h-auto max-w-full max-h-[50vh] md:max-h-[400px] object-contain rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] mb-8 border-4 border-white"
+                />
+                <h1 className="text-5xl md:text-8xl font-black text-white uppercase tracking-widest text-center mb-10 drop-shadow-2xl">
+                  Bolo ACM Kesari
+                </h1>
+                <button
+                  onClick={proceedToOpening}
+                  className="px-10 py-5 bg-white text-red-700 font-extrabold text-xl rounded-lg hover:bg-zinc-200 transition duration-200 shadow-2xl tracking-widest uppercase"
+                >
+                  Enter the Gateway
+                </button>
+              </div>
+            </motion.div>
+          ) : (
           <motion.div
             key="gatekeeper"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -457,11 +483,7 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
             <motion.div
               animate={{ y: [0, -6, 0] }}
               transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-              className={
-                activeBribe 
-                  ? "w-64 h-64 md:w-80 md:h-80 bg-zinc-900 border-2 border-[#ffbe0b] rounded-lg mb-8 flex items-center justify-center relative shadow-[0_0_30px_rgba(255,190,11,0.3)] overflow-hidden"
-                  : "w-36 h-36 bg-zinc-900 border-2 border-accent rounded-full mb-8 flex items-center justify-center relative shadow-[0_0_20px_rgba(0,217,255,0.2)] overflow-hidden"
-              }
+              className="w-36 h-36 bg-zinc-900 border-2 border-accent rounded-full mb-8 flex items-center justify-center relative shadow-[0_0_20px_rgba(0,217,255,0.2)] overflow-hidden"
             >
               {/* Fallback silhouette */}
               <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">
@@ -470,8 +492,8 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
                 </svg>
               </div>
               <img 
-                src={activeBribe ? GATEKEEPER_BRIBE_REACTION_PHOTO : GATEKEEPER_PRESIDENT_PHOTO}
-                alt={activeBribe ? "Bribe Reaction" : "President"}
+                src={GATEKEEPER_PRESIDENT_PHOTO}
+                alt="President"
                 className="absolute inset-0 w-full h-full object-cover z-10"
                 onError={(e) => { e.currentTarget.style.display = 'none' }}
               />
@@ -489,7 +511,7 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
 
             {/* Progression & Choices */}
             <div className="w-full flex flex-col gap-3">
-              {dialogue[dialogIndex].options && !activeBribe ? (
+              {dialogue[dialogIndex].options ? (
                 dialogue[dialogIndex].options.map((opt) => (
                   <button
                     key={opt.label}
@@ -503,19 +525,18 @@ export function RevealIntro({ onComplete, onScrollUnlock }: RevealIntroProps) {
               ) : (
                 <button
                   onClick={
-                    dialogIndex === dialogue.length - 1 || activeBribe
+                    dialogIndex === dialogue.length - 1
                       ? proceedToOpening
                       : handleDialogNext
                   }
                   className="w-full py-3 bg-accent text-black font-extrabold rounded-lg hover:bg-white transition duration-200"
                 >
-                  {activeBribe ? "Continue" : (dialogIndex === dialogue.length - 1 ? "ENTER THE GATEWAY" : "CONTINUE")}
+                  {dialogIndex === dialogue.length - 1 ? "ENTER THE GATEWAY" : "CONTINUE"}
                 </button>
               )}
             </div>
-
-            {/* Bypass Scroll Prompt (removed) */}
           </motion.div>
+          )
         )}
 
         {/* State: Opening (Framer Motion Vault Sliding Open) */}

@@ -1,13 +1,20 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 export function Hero() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
       {/* Floating particles background */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
+      <div className="absolute inset-0 pointer-events-none">
+        {mounted && [...Array(20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-accent rounded-full opacity-30"
@@ -56,9 +63,12 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="flex justify-center gap-4"
         >
-          <div className="px-6 py-3 border border-accent text-accent rounded-lg hover:bg-accent hover:text-accent-foreground transition">
+          <button 
+            onClick={() => document.getElementById('team-section')?.scrollIntoView({ behavior: 'smooth' })}
+            className="px-6 py-3 border border-accent text-accent rounded-lg hover:bg-accent hover:text-accent-foreground transition cursor-pointer"
+          >
             Scroll to meet the legends
-          </div>
+          </button>
         </motion.div>
 
         {/* Scroll indicator */}
